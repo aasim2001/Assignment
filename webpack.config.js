@@ -1,4 +1,5 @@
 const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: path.resolve(__dirname, "src/index.tsx"),
@@ -36,6 +37,13 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: "src/questions", to: ""},
+      ],
+    }),
+  ],
   devServer: {
     hot: true,
     inline: true,

@@ -1,52 +1,99 @@
 import "./style.scss";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
+import { getNewQuestion, updateVote } from "./service";
 
-const questions = [
-  {
-    id: 1,
-    value: "How you feel today:",
-    options: [
-      {
-        optionId: 1,
-        value: "Brilliant! I have so much energy",
-        count: 0,
-      },
-      {
-        optionId: 2,
-        value: "Always can be worse.",
-        count: 0,
-      },
-      {
-        optionId: 3,
-        value: "Please, end my misery.",
-        count: 0,
-      },
-    ],
-  },
-];
+if (!localStorage.getItem("liveQuestions")) {
+  localStorage.setItem("liveQuestions", JSON.stringify([]));
+}
 
-function Counter() {
-  console.log(questions[0].value);
-  const question = questions[0];
+if (!localStorage.getItem("questionsStorage")) {
+  localStorage.setItem("questionsStorage", JSON.stringify([]));
+}
 
-  const answeredQuestion = (answer: number) => {
-    console.log(answer);
-    
-  }
+function PollGraph({ vote, options }: any) {
+  console.log(options);
 
-  const [count, setCount] = useState(0);
+  const totalVotes = options.reduce((r: number, a: any) => {
+    r = r + a.count;
+    return r;
+  }, 0);
+
+  const progressRef = useRef(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      const progresEle: HTMLElement = progressRef.current;
+      if (progresEle) {
+        progresEle.style.width = `${(vote / totalVotes) * 100}%`;
+      }
+    }, 0);
+  }, [vote]);
+
   return (
-    <div className="affinity_poll">
-      <div className="card">
+    <>
+      <div className="progress2 progress-moved">
+        <div className="progress-bar2" ref={progressRef}></div>
+      </div>
+      <div className="voteStatus">
+        <div>
+          Votes: {vote} / {totalVotes}
+        </div>
+        <div>{Math.floor((vote / totalVotes) * 100)}%</div>
+      </div>
+    </>
+  );
+}
+
+function Poll({ question }: any) {
+  const [answer, setAnswer] = useState(null);
+  const [options, setOptions] = useState(question.options);
+
+  const answeredQuestion = (questionId: number, optionId: number) => {
+    if (!answer) {
+      const updatedOptions = updateVote(questionId, optionId);
+      setOptions(updatedOptions);
+      setAnswer(optionId);
+    }
+  };
+
+  return (
+    <div className="poll" data-qid={question.id}>
+      <div className={`card ${answer != null ? "answered" : ""}`}>
         <h3>{question.value}</h3>
 
-        {question.options.map((ops) => {
+        {options.map((ops: any) => {
           return (
-            <div className="option" key={ops.optionId} onClick={() => answeredQuestion(ops.optionId)}>
-              <div className="radioBtn"></div>
-              <div className="value">{ops.value}</div>
-              
+            <div
+              className={`option ${answer == ops.optionId ? "selected" : ""}`}
+              key={ops.optionId}
+              onClick={() => answeredQuestion(question.id, ops.optionId)}
+            >
+              <div
+                className={`btn ${answer == ops.optionId ? "selected" : ""}`}
+              >
+                <div className="radioBtn"></div>
+                <div className="value">{ops.value}</div>
+              </div>
+              {answer != null ? (
+                <PollGraph
+                  className="answerContainer"
+                  options={options}
+                  vote={ops.count}
+                />
+              ) : null}
             </div>
           );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const selectEle = document.querySelectorAll(".affinity_poll");
+selectEle.forEach((ele: HTMLElement) => {
+  const question = getNewQuestion();
+  const root = createRoot(ele);
+  root.render(<Poll question={question} />);
+});
