@@ -46,6 +46,20 @@ function PollGraph({ vote, options }: any) {
   );
 }
 
+function Check() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="15"
+      viewBox="0 -960 960 960"
+      width="15"
+      fill="#fff"
+    >
+      <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
+    </svg>
+  );
+}
+
 function Poll({ question }: any) {
   const [answer, setAnswer] = useState(null);
   const [options, setOptions] = useState(question.options);
@@ -73,7 +87,9 @@ function Poll({ question }: any) {
               <div
                 className={`btn ${answer == ops.optionId ? "selected" : ""}`}
               >
-                <div className="radioBtn"></div>
+                <div className="radioBtn">
+                  {answer == ops.optionId ? <Check /> : null}
+                </div>
                 <div className="value">{ops.value}</div>
               </div>
               {answer != null ? (

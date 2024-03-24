@@ -1,17 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+$primaryColor:#1ca46d;
 
 .affinity_poll {
   font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
   font-weight: 100;
   font-style: normal;
+  box-sizing: border-box;
   .card {
-    width: 350px;
+    min-width: 250px;
     height: auto;
     box-shadow: 3px 3px 12px #ccc;
     border-radius: 10px;
     margin: 10px;
     padding: 16px;
+    box-sizing: border-box;
+
     .voteStatus {
         display: flex;
         justify-content: space-between;
@@ -36,6 +40,10 @@
       &:hover {
         background-color: #f1f1f1;
       }
+      &.selected {
+        background: #f7fffc;
+        border: 1px solid #acffe2;
+      }
       .btn {
         display: flex;
         align-items: center;
@@ -54,7 +62,7 @@
             width: 16px;
             height: 16px;
             min-width: 16px;
-            background-color: #1ca46d;
+            background-color: $primaryColor;
             border-radius: 50%;
           }
         }
@@ -74,7 +82,7 @@
         width: 0;
         height: 9px;
         border-radius: 30px;
-        background: #1ca46d;
+        background: $primaryColor;
         transition: width 2s;
       }
     }
